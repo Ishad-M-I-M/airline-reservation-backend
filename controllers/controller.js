@@ -72,7 +72,7 @@ app.post("/loadSeatnumber", (req, res) => {
 
     let flight_id = parseInt(req.body.flight_id);
     let seat_inclass = req.body.class.trim();
-    let stmt = "";
+    let stmt;
     if (seat_inclass === "Economy") {
         stmt = "SELECT get_Economy_seats(?)";
     } else if (seat_inclass === "Business") {
@@ -160,7 +160,7 @@ app.post("/search-result", function (req, res) {
                               and destination =
                                   (select airport_id from airport where code = "${departingAirportCode}");`)
                         .then((result) => {
-                            if (result[0].length != 0) {
+                            if (result[0].length !== 0) {
                                 let return_route_id = JSON.stringify(result[0][0]["r2_id"]);
                                 if (return_route_id != null) {
                                     db.raw(`select *

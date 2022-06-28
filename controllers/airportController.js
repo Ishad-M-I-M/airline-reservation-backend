@@ -9,14 +9,15 @@ router.get('/', function (req, res){
         return res.send({success: true, airports: results[0]});
     })
     .catch((err) => {
-        return res.status(404).send({'sucess': false});
+        console.error(err);
+        return res.status(404).send({'success': false});
     });
 });
 
 router.post('/', function (req, res){
     const location = req.body.location.map(({location})=> location);
     db.raw(`call add_airport(?, ?, ?, ?)`, [req.body.code, req.body.name, location.join(','), location.length ])
-    .then((results) => { return res.send({success: true})})
+    .then(() => { return res.send({success: true})})
     .catch((err) => { 
         console.log(err);
         return res.status(404).send({success: false});

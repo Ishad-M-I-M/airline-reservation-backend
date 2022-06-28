@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
 const path = require('path');
 const session = require('express-session');
 
@@ -20,6 +21,7 @@ const controller = require('./controllers/controller');
 
 const db = require('./db');
 // app.use(express.static(path.join(__dirname, 'build')));
+app.use(cors());
 app.use(express.json());
 
 const sessionStore = new KnexSessionStore({

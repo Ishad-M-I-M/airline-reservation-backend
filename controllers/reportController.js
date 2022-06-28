@@ -141,7 +141,7 @@ router.post("/bookings", (req, res) => {
                 return res.status(500).json({success: false});
             });
 
-        } else if (req.body.Enddate !== "" && req.body.Startdate == "") {
+        } else if (req.body.Enddate !== "" && req.body.Startdate === "") {
             db.raw("SELECT discount.type, COUNT(ticket.user_id) AS Booking_Count FROM discount LEFT JOIN user ON discount.type = user.discount_type LEFT JOIN ticket USING(user_id) LEFT JOIN booking USING(ticket_id) WHERE NOT (ticket.date > ?)  GROUP BY type;", [req.body.Enddate]).then((result) => {
                 return res.json({success: true, data: result[0]});
             }).catch((err) => {
