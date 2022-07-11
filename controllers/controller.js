@@ -17,7 +17,7 @@ app.post("/fetchFlight/clerk", (req, res) => {
         } else if (req.body.future === true) {
             sql = "select flight_id, takeoff_time, departure_time, model, airport1.code as origin, airport2.code as destination from flight left join aircraft using(aircraft_id) left join route using(route_id) left join airport as airport1 on airport1.airport_id = route.origin left join airport as airport2 on airport2.airport_id=route.destination where takeoff_time > now() and flight_id=?";
         } else {
-            return res.status(400).json({success: false})
+            return res.status(400).json({ success: false })
         }
     } else if (req.body.tail_number !== "" && req.body.flight_id === "" && req.body.origin === "" && req.body.destination === "") {
         cols = [req.body.tail_number.trim()];
@@ -30,7 +30,7 @@ app.post("/fetchFlight/clerk", (req, res) => {
         } else if (req.body.future === true) {
             sql = "select flight_id, takeoff_time, departure_time, model, airport1.code as origin, airport2.code as destination from flight left join aircraft using(aircraft_id) left join route using(route_id) left join airport as airport1 on airport1.airport_id = route.origin left join airport as airport2 on airport2.airport_id=route.destination where tail_number =? and takeoff_time > now()";
         } else {
-            return res.status(400).json({success: false});
+            return res.status(400).json({ success: false });
         }
     } else if (req.body.origin !== "" && req.body.destination !== "" && req.body.flight_id === "" && req.body.tail_number === "") {
         cols = [req.body.origin.trim(), req.body.destination.trim()];
@@ -43,17 +43,17 @@ app.post("/fetchFlight/clerk", (req, res) => {
         } else if (req.body.future === true) {
             sql = "select flight_id, model, airport1.code as origin, airport2.code as destination, takeoff_time, departure_time from flight left join aircraft on flight.aircraft_id=aircraft.aircraft_id left join route using(route_id) left join airport as airport1 on airport1.airport_id=route.origin left join airport as airport2 on airport2.airport_id=route.destination where airport1.code=? and airport2.code=? and takeoff_time > now()";
         } else {
-            return res.status(400).json({success: false});
+            return res.status(400).json({ success: false });
         }
-    } else return res.status(400).json({success: false});
+    } else return res.status(400).json({ success: false });
 
     db.raw(sql, cols)
         .then((data) => {
-            return res.status(200).json({success: true, data: data[0]});
+            return res.status(200).json({ success: true, data: data[0] });
         }).catch((err) => {
-        console.error(err);
-        return res.status(500).json({success: false});
-    })
+            console.error(err);
+            return res.status(500).json({ success: false });
+        })
 
 });
 
@@ -64,7 +64,7 @@ app.post("/bookingFlights", (req, res) => {
         });
     }).catch((err) => {
         console.error(err);
-        return res.status(500).json({success: false});
+        return res.status(500).json({ success: false });
     });
 });
 
@@ -72,7 +72,7 @@ app.post("/loadSeatnumber", (req, res) => {
 
     let flight_id = parseInt(req.body.flight_id);
     let seat_inclass = req.body.class.trim();
-    let stmt;
+    let stmt = "";
     if (seat_inclass === "Economy") {
         stmt = "SELECT get_Economy_seats(?)";
     } else if (seat_inclass === "Business") {
@@ -87,29 +87,27 @@ app.post("/loadSeatnumber", (req, res) => {
                 success: true, data: data[0],
             });
         }).catch((err) => {
-        console.error(err);
-        return res.status(500).json({success: false});
-    });
+            console.error(err);
+            return res.status(500).json({ success: false });
+        });
 });
 
 app.post("/bookTicket", (req, res) => {
-    console.log(req.body);
     db.raw("SELECT cost FROM flight LEFT JOIN flight_cost USING(flight_id) WHERE flight_id=? AND class=?", [req.body.flight_id, req.body.class]).then((data) => {
         if (data[0].length > 0) {
-            console.log("Data available");
-            db.raw("CALL book_ticket(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [req.body.passenger_id, req.body.passenger_name, req.body.date, req.body.passenger_address, req.session.userID, req.body.flight_id, req.body.seat_number, req.body.date, req.body.class, data1[0].cost,]).then(() => {
+            db.raw("CALL book_ticket(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [req.body.passenger_id, req.body.passenger_name, req.body.date, req.body.passenger_address, req.session.userID, req.body.flight_id, req.body.seat_number, req.body.date, req.body.class, data[0][0]['cost']]).then(() => {
                 return res.json({
                     success: true, msg: "Booking Successful",
                 });
             }).catch((err) => {
                 console.error(err);
-                return res.status(500).json({success: false});
+                return res.status(500).json({ success: false });
             });
         }
     })
         .catch((err) => {
             console.error(err);
-            return res.status(500).json({success: false});
+            return res.status(500).json({ success: false });
         });
 });
 
@@ -120,9 +118,9 @@ app.get("/location", (req, res) => {
                 success: true, data: data[0],
             });
         }).catch((err) => {
-        console.error(err);
-        return res.status(500).json({success: false});
-    });
+            console.error(err);
+            return res.status(500).json({ success: false });
+        });
 
 });
 
@@ -160,7 +158,7 @@ app.post("/search-result", function (req, res) {
                               and destination =
                                   (select airport_id from airport where code = "${departingAirportCode}");`)
                         .then((result) => {
-                            if (result[0].length !== 0) {
+                            if (result[0].length != 0) {
                                 let return_route_id = JSON.stringify(result[0][0]["r2_id"]);
                                 if (return_route_id != null) {
                                     db.raw(`select *
@@ -168,31 +166,32 @@ app.post("/search-result", function (req, res) {
                                               where route_id = '${return_route_id}'
                                                 and DATE(takeoff_time) = '${destinationDate}'`)
                                         .then((data) => {
-                                        return res.json({
-                                            success: true, data: flightDetails, return_data: result,
+
+                                            return res.json({
+                                                success: true, data: flightDetails, return_data: data[0],
+                                            });
+                                        }).catch((err) => {
+                                            console.error(err);
+                                            return res.status(500).json({ success: false });
                                         });
-                                    }).catch((err) => {
-                                        console.error(err);
-                                        return res.status(500).json({success: false});
-                                    });
 
                                 }
                             }
                         }).catch((err) => {
-                        console.error(err);
-                        return res.status(500).json({success: false});
-                    });
+                            console.error(err);
+                            return res.status(500).json({ success: false });
+                        });
                 }).catch((err) => {
                     console.error(err);
-                    return res.status(500).json({success: false});
+                    return res.status(500).json({ success: false });
                 });
             }
         } else {
-            res.json({success: true, data: flightDetails});
+            res.json({ success: true, data: flightDetails });
         }
     }).catch((err) => {
         console.error(err);
-        return res.status(500).json({success: false});
+        return res.status(500).json({ success: false });
     });
 
 });
@@ -205,8 +204,11 @@ app.post("/flightCard", function (req, res) {
     let plat_booked_seats = [];
     let Economy_seats, Business_seats, Platinum_seats;
 
+
+
     const promise1 = new Promise((resolve, reject) => {
-        db.raw(`select seat_number
+        db.raw(
+            `select seat_number
                 from ticket
                 where flight_id = ${f_id}
                   and class = 'Economy';
@@ -220,20 +222,31 @@ app.post("/flightCard", function (req, res) {
           and class = 'Platinum';
         select Economy_seats, Business_seats, Platinum_seats
         from aircraft
-        where aircraft_id = ${a_id};`)
+        where aircraft_id = ${a_id};`
+
+
+        )
             .then((result) => {
+
+
                 for (let i = 0; i < result[0][0].length; i++) {
                     eco_booked_seats.push(Number(result[0][0][i]["seat_number"]));
                 }
+
+
                 for (let i = 0; i < result[0][1].length; i++) {
                     busi_booked_seats.push(Number(result[0][1][i]["seat_number"]));
                 }
+
+
                 for (let i = 0; i < result[0][2].length; i++) {
                     plat_booked_seats.push(Number(result[0][2][i]["seat_number"]));
                 }
+
                 Economy_seats = Number(result[0][3][0]["Economy_seats"]);
                 Business_seats = Number(result[0][3][0]["Business_seats"]);
                 Platinum_seats = Number(result[0][3][0]["Platinum_seats"]);
+
 
                 return res.json({
                     eco_booked_seats,
@@ -244,23 +257,25 @@ app.post("/flightCard", function (req, res) {
                     Platinum_seats,
                 });
             }).catch((err) => {
-            console.error(err);
-            return res.status(500).json({success: false});
-        })
+                console.error(err);
+                return res.status(500).json({ success: false });
+            })
     });
 
 });
 
 app.post("/reserveBooking", (req, res) => {
-    console.log(req.session.userID);
-    console.log(req.body);
-    db.raw("call book_ticket_proc(?,?,?,?,?,?,?,?)", [req.body.f_id, req.session.userID, req.body.passengerId, req.body.passengerName, req.body.passengerAdd, req.body.bDay, req.body.flight_class, req.body.seatNo,]).then((result) => {
+
+    let userId = req.session.userID ? req.session.userID : -1;
+
+
+    db.raw("call book_ticket_proc(?,?,?,?,?,?,?,?)", [req.body.f_id, userId, req.body.passengerId, req.body.passengerName, req.body.passengerAdd, req.body.bDay, req.body.flight_class, req.body.seatNo,]).then((result) => {
         return res.json({
             success: true, data: result[0],
         });
     }).catch((err) => {
         console.error(err);
-        return res.status(500).json({success: false});
+        return res.status(500).json({ success: false });
     });
 });
 
@@ -274,51 +289,54 @@ app.post("/confirmBooking", (req, res) => {
                 success: true, data: result[0],
             });
         }).catch((err) => {
-        console.error(err);
-        return res.status(500).json({success: false});
-    });
+            console.error(err);
+            return res.status(500).json({ success: false });
+        });
 
 });
 
 app.post("/checkValidBooking", (req, res) => {
-    console.log(req.body);
 
-    db.raw(`SELECT ticket_id
+    if (req.body.f_id)
+
+        db.raw(`SELECT ticket_id
             from ticket
             where flight_id = ${req.body.f_id}
               and passenger_id = '${req.body.passengerId}'
               and status = 1`).then((result) => {
-        db.raw(`SELECT seat_number
+            db.raw(`SELECT seat_number
                 from ticket
                 where flight_id = ${req.body.f_id}
                   and seat_number = ${req.body.seatNo}`).then((result2) => {
-            if (result2[0].length !== 0) {
-                res.json({
-                    success: true, data: "seat_occupied",
-                });
-            } else {
-                if (result[0].length !== 0) {
+                if (result2[0].length !== 0) {
                     res.json({
-                        success: true, data: "passenger_occupied",
+                        success: true, data: "seat_occupied",
                     });
                 } else {
-                    res.json({
-                        success: true, data: "available",
-                    });
+                    if (result[0].length !== 0) {
+                        res.json({
+                            success: true, data: "passenger_occupied",
+                        });
+                    } else {
+                        res.json({
+                            success: true, data: "available",
+                        });
+                    }
                 }
-            }
+            }).catch((err) => {
+                console.error(err);
+                return res.status(500).json({ success: false });
+            });
+
         }).catch((err) => {
             console.error(err);
-            return res.status(500).json({success: false});
+            return res.status(500).json({ success: false });
         });
-
-    }).catch((err) => {
-        console.error(err);
-        return res.status(500).json({success: false});
-    });
 });
 
 app.get("/isReserved", (req, res) => {
+
+
     db.raw(`select ticket_id
             from ticket
             where flight_id = ${req.query.f_id}
@@ -329,79 +347,45 @@ app.get("/isReserved", (req, res) => {
         });
     }).catch((err) => {
         console.error(err);
-        return res.status(500).json({success: false});
+        return res.status(500).json({ success: false });
     });
 });
 
 app.delete("/releaseBooking", (req, res) => {
-    db.beginTransaction(function (err) {
-        if (err) throw err;
-        db.query(`delete
-                  from ticket
-                  where flight_id = ${req.body.f_id}
-                    and seat_number = ${req.body.seatNo}
-                    and status = 0`, function (err, result) {
-            if (err) {
-                db.rollback(() => {
-                    console.log(err);
 
-                    res.json({success: false});
-                });
-            }
-            db.query(`delete
-                      from passenger
-                      where passenger_id = '${req.body.passengerId}'
-                        and passenger_id not in (select passenger_id from ticket)`, function (err, result) {
-                if (err) {
-                    console.log(err);
-                    db.rollback(() => {
-                        res.json({success: false});
-                    });
-                }
-                db.commit(function (err) {
-                    if (err) {
-                        db.rollback(() => {
-                            console.log(err);
 
-                            res.json({success: false});
-                        });
-                    }
-                    res.json({
-                        success: true,
-                    });
-                });
-            });
+    db.raw("CALL release_booking(?, ?, ?)", [req.body.f_id, req.body.seatNo, req.body.passengerId]).then(() => {
+        return res.json({
+            success: true
         });
+    }).catch((err) => {
+        console.error(err);
+        return res.status(500).json({ success: false });
     });
 
-    // db.query(
-    //   `delete from  ticket where flight_id=${req.body.f_id} and seat_number=${req.body.seatNo} and status=0`,
-    //   (err, result) => {
-    //     if (err) {
-    //       res.json({ success: false });
-    //     } else {
-    //       res.json({
-    //         success: true,
-    //         data: result,
-    //       });
-    //     }
-    //   }
-    // );
+
+
 });
 
 app.get("/getTickets", (req, res) => {
-    db.raw(`select *
+    if (req.session.userID) {
+        db.raw(`select *
             from ticket
             where user_id = ${req.session.userID}
               and status = 1;`)
-        .then((result) => {
-            return res.json({
-                success: true, data: result[0],
+            .then((result) => {
+                return res.json({
+                    success: true, data: result[0],
+                });
+            }).catch((err) => {
+                console.error(err);
+                return res.status(500).json({ success: false });
             });
-        }).catch((err) => {
-        console.error(err);
-        return res.status(500).json({success: false});
-    });
+    }
+    else {
+        return res.status(500).json({ success: false });
+
+    }
 });
 
 module.exports = app;

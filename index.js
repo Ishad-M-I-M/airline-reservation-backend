@@ -1,6 +1,5 @@
 const express = require('express');
 const app = express();
-const cors = require('cors');
 const path = require('path');
 const session = require('express-session');
 
@@ -17,11 +16,12 @@ const flightScheduleController = require('./controllers/flightScheduleController
 const reportController = require('./controllers/reportController');
 const discountController = require('./controllers/discountController');
 const authController = require('./controllers/authController');
+const userController = require('./controllers/userController');
 const controller = require('./controllers/controller');
+
 
 const db = require('./db');
 // app.use(express.static(path.join(__dirname, 'build')));
-app.use(cors());
 app.use(express.json());
 
 const sessionStore = new KnexSessionStore({
@@ -49,6 +49,7 @@ app.use('/flightSchedule', flightScheduleController);
 app.use('/report', reportController);
 app.use('/discount', discountController);
 app.use('/auth', authController);
+app.use('/user', userController);
 app.use('/', controller);
 
 // app.get('/', function(req, res) {

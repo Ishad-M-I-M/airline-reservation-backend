@@ -14,15 +14,16 @@ module.exports = {
       database: process.env.DATABASE_NAME,
       user:     process.env.DATABASE_USER,
       password: process.env.DATABASE_PASS,
+      multipleStatements: true
     },
     migrations: {
       tableName: 'knex_migrations',
       directory: "./db/migrations"
     },
     seeds: {
-			directory: "./db/seeds",
-		},
-		useNullAsDefault: true,
+      directory: "./db/seeds",
+    },
+    useNullAsDefault: true,
   },
 
   production: {
@@ -32,6 +33,7 @@ module.exports = {
       database: process.env.DATABASE_NAME,
       user:     process.env.DATABASE_USER,
       password: process.env.DATABASE_PASS,
+      multipleStatements: true
     },
     pool: {
       min: 2,
@@ -42,9 +44,9 @@ module.exports = {
       directory: "./db/migrations"
     },
     seeds: {
-			directory: "./db/seeds",
-		},
-		useNullAsDefault: true,
+      directory: "./db/seeds",
+    },
+    useNullAsDefault: true,
   }
 
 };
