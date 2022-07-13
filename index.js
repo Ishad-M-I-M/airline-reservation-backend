@@ -45,15 +45,15 @@ app.use(session({
     }
 }));
 
-app.use('/airport', airportController );
-app.use('/route', routeController );
-app.use('/aircraft', aircraftController);
-app.use('/flightSchedule', flightScheduleController);
-app.use('/report', reportController);
-app.use('/discount', discountController);
-app.use('/auth', authController);
-app.use('/user', userController);
-app.use('/', controller);
+app.use('/api/airport', airportController );
+app.use('/api/route', routeController );
+app.use('/api/aircraft', aircraftController);
+app.use('/api/flightSchedule', flightScheduleController);
+app.use('/api/report', reportController);
+app.use('/api/discount', discountController);
+app.use('/api/auth', authController);
+app.use('/api/user', userController);
+app.use('/api/', controller);
 
 // app.get('/', function(req, res) {
 //     res.sendFile(path.join(__dirname, 'build', 'index.html'))
