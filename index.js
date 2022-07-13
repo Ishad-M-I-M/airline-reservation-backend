@@ -2,11 +2,14 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const session = require('express-session');
+const cors = require('cors');
 
 const KnexSessionStore = require('connect-session-knex')(session);
 require('dotenv').config({
     path:'../.env'
 });
+
+app.use(cors());
 
 // controllers
 const airportController = require('./controllers/airportController');
