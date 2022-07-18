@@ -9,7 +9,13 @@ require('dotenv').config({
     path:'../.env'
 });
 
-app.use(cors());
+var corsOptions = {
+    origin: 'https://airline-reservation-frontend.vercel.app',
+    optionsSuccessStatus: 200, // For legacy browser support
+    credentials: true
+}
+
+app.use(cors(corsOptions));
 
 // controllers
 const airportController = require('./controllers/airportController');
